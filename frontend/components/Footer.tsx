@@ -1,23 +1,22 @@
 import Link from "next/link";
-import { Compass, Github, Heart } from "lucide-react";
+import { Command, Github, Terminal } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-background/50 py-12 mt-20">
+    <footer className="border-t border-white/[0.08] bg-[#090b11] py-12 mt-20 text-xs font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
-            <Compass className="w-4 h-4 text-cyan-400" />
+          <div className="w-6 h-6 rounded bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400">
+            <Command className="w-3.5 h-3.5" />
           </div>
-          <span className="text-sm font-semibold text-gray-300">RepoPilot AI</span>
-          <span className="text-xs text-gray-500">— GitHub Repository Intelligence Assistant</span>
+          <span className="font-semibold text-zinc-300">RepoPilot</span>
+          <span className="text-zinc-500">— GitHub Repository Intelligence & Contribution System</span>
         </div>
 
-        <div className="flex items-center gap-6 text-xs text-gray-400">
-          <Link href="/docs/architecture.md" className="hover:text-white transition-colors">Architecture</Link>
-          <Link href="/docs/api.md" className="hover:text-white transition-colors">API Docs</Link>
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
-            <Github className="w-4 h-4" /> GitHub
+        <div className="flex items-center gap-6 text-zinc-400 font-medium">
+          <Link href="/analyze" className="hover:text-white transition-colors">Analyzer</Link>
+          <a href="https://github.com" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors font-mono">
+            <Github className="w-3.5 h-3.5" /> GitHub
           </a>
         </div>
       </div>
