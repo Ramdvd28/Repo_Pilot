@@ -1,36 +1,53 @@
 {
-  "version": 2,
-  "name": "repopilot-ai",
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "backend",
+      "framework": "fastapi"
     },
-    {
-      "src": "backend/app/main.py",
-      "use": "@vercel/python"
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "backend",
+          "format": "url",
+          "env": "BACKEND_SERVICE_URL"
+        }
+      ]
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/app/main.py"
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
     },
     {
-      "src": "/docs",
-      "dest": "backend/app/main.py"
+      "source": "/docs",
+      "destination": {
+        "service": "backend"
+      }
     },
     {
-      "src": "/redoc",
-      "dest": "backend/app/main.py"
+      "source": "/redoc",
+      "destination": {
+        "service": "backend"
+      }
     },
     {
-      "src": "/openapi.json",
-      "dest": "backend/app/main.py"
+      "source": "/openapi.json",
+      "destination": {
+        "service": "backend"
+      }
     },
     {
-      "src": "/(.*)",
-      "dest": "frontend/$1"
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
     }
   ]
 }
