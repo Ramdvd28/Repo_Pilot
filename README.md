@@ -81,6 +81,18 @@ npm run build # Verify production build
 npm run dev
 ```
 
+### 4. Deploying to Vercel
+RepoPilot AI includes root and frontend [`vercel.json`](vercel.json) configuration files for zero-config Vercel deployment:
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy monorepo directly to Vercel
+vercel
+```
+Or import your GitHub repository directly in the [Vercel Dashboard](https://vercel.com/new). Environment variables (`OPENAI_API_KEY`, `GEMINI_API_KEY`, `GITHUB_TOKEN`, `DATABASE_URL`) can be configured in Vercel Project Settings.
+
 ---
 
 ## 🧪 Testing & Quality Assurance
