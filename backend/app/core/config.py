@@ -35,6 +35,12 @@ class Settings(BaseSettings):
             if self.DATABASE_URL.startswith("postgresql://"):
                 return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
             return self.DATABASE_URL
+        
+        # On Vercel / AWS Lambda, use SQLite in /tmp by default if no DATABASE_URL is set
+        import os
+        if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+            return "sqlite+aiosqlite:////tmp/repopilot.db"
+
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     # GitHub API

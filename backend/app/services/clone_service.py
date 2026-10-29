@@ -8,13 +8,21 @@ import io
 from fastapi import HTTPException, status
 from app.core.config import settings
 
-STORAGE_DIR = Path("storage/cloned_repos").resolve()
+def _get_storage_dir() -> Path:
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        return Path("/tmp/storage/cloned_repos")
+    return Path("storage/cloned_repos").resolve()
+
+STORAGE_DIR = _get_storage_dir()
 
 
 class CloneService:
-    def __init__(self, storage_dir: Path = STORAGE_DIR):
-        self.storage_dir = storage_dir
-        self.storage_dir.mkdir(parents=True, exist_ok=True)
+    def __init__(self, storage_dir: Path = None):
+        self.storage_dir = storage_dir or _get_storage_dir()
+        try:
+            self.storage_dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
 
     def get_repo_dir(self, repo_id: str) -> Path:
         repo_dir = (self.storage_dir / repo_id).resolve()

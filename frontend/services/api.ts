@@ -39,12 +39,22 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    let errorDetail = "An unexpected error occurred.";
+    let errorDetail = "";
     try {
       const errorJson = await response.json();
-      errorDetail = errorJson.detail || errorJson.message || errorDetail;
+      errorDetail = errorJson.detail || errorJson.message || "";
     } catch {
-      // Ignore json parse error
+      // Response body is not JSON (e.g. HTML 404/500/502)
+    }
+
+    if (!errorDetail) {
+      if (response.status === 404) {
+        errorDetail = "API endpoint not found (404). Please ensure the backend is running and reachable.";
+      } else if (response.status === 502 || response.status === 503) {
+        errorDetail = `Backend service is temporarily unavailable (${response.status}).`;
+      } else {
+        errorDetail = `Request failed with HTTP status ${response.status} (${response.statusText || "Server Error"}).`;
+      }
     }
     throw new ApiError(errorDetail, response.status);
   }
