@@ -33,7 +33,13 @@ class GitHubService:
         return match.group(1), match.group(2)
 
     async def fetch_repository_metadata(self, github_url: str) -> Dict[str, Any]:
-        owner, repo = self.parse_github_url(github_url)
+        try:
+            owner, repo = self.parse_github_url(github_url)
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
         
         async with httpx.AsyncClient(timeout=15.0) as client:
             repo_url = f"https://api.github.com/repos/{owner}/{repo}"
@@ -50,10 +56,10 @@ class GitHubService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"GitHub repository '{owner}/{repo}' not found or is private."
                 )
-            elif response.status_code == 403 and "rate limit" in response.text.lower():
+            elif response.status_code == 403:
                 raise HTTPException(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="GitHub API rate limit exceeded. Provide a GITHUB_TOKEN in settings to increase quota."
+                    detail="GitHub API rate limit reached or access restricted. Please configure GITHUB_TOKEN in settings to increase quota."
                 )
             elif response.status_code != 200:
                 raise HTTPException(

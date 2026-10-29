@@ -9,7 +9,7 @@ from fastapi import HTTPException, status
 from app.core.config import settings
 
 def _get_storage_dir() -> Path:
-    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    if os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
         return Path("/tmp/storage/cloned_repos")
     return Path("storage/cloned_repos").resolve()
 
