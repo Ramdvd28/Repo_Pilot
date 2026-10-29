@@ -28,7 +28,7 @@ class IngestionService:
         if not repo:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Repository with ID '{repo_id}' not found."
+                detail=f"Repository '{repo_id}' not found."
             )
 
         # 2. Clone repository to storage

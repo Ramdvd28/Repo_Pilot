@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { api, ApiError } from "@/services/api";
 import { Repository, ArchitectureGraphResponse, ArchNode } from "@/types/repo";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function ArchitectureVisualizationPage() {
   const params = useParams();
@@ -47,7 +48,11 @@ export default function ArchitectureVisualizationPage() {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      setError("Failed to load architecture graph.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Failed to load architecture graph.");
+      }
     }
   };
 
@@ -94,6 +99,10 @@ export default function ArchitectureVisualizationPage() {
         <p className="text-sm text-gray-400">Loading Repository Architecture Visualization...</p>
       </div>
     );
+  }
+
+  if (error || !repo) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={loadGraph} />;
   }
 
   return (

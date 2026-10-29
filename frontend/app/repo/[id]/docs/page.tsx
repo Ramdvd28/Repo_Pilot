@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { api, ApiError } from "@/services/api";
 import { Repository, TechDocsResponse } from "@/types/repo";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function TechnicalDocsPage() {
   const params = useParams();
@@ -41,7 +42,11 @@ export default function TechnicalDocsPage() {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      setError("Failed to load technical documentation.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Failed to load technical documentation.");
+      }
     }
   };
 
@@ -77,6 +82,10 @@ export default function TechnicalDocsPage() {
         <p className="text-sm text-gray-400">Loading Technical Documentation Suite...</p>
       </div>
     );
+  }
+
+  if (error || !repo) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={loadDocs} />;
   }
 
   return (

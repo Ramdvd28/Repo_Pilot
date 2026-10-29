@@ -1,10 +1,22 @@
 import pytest
 from app.rag.rag_engine import RAGEngine
+from app.models.repository import Repository
 from app.models.schema_models import CodeChunk
 
 
 @pytest.mark.asyncio
 async def test_rag_engine_answer_generation(db_session):
+    # Seed repository record
+    repo = Repository(
+        id="test-repo-123",
+        github_url="https://github.com/test/auth-repo",
+        owner="test",
+        name="auth-repo",
+        default_branch="main"
+    )
+    db_session.add(repo)
+    await db_session.commit()
+
     # Seed dummy code chunk
     chunk = CodeChunk(
         repository_id="test-repo-123",

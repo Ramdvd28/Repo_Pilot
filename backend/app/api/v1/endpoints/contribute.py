@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.services.code_review_service import CodeReviewService
 from app.services.pr_generator_service import PrGeneratorService
+from app.services.repo_service import RepositoryService
 
 router = APIRouter()
 
@@ -50,6 +51,14 @@ async def review_code_diff(
     Executes AI Code Review over a provided git diff.
     Returns structured findings with severity levels, explanations, and suggested code fixes.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     reviewer = CodeReviewService(db)
     review_data = await reviewer.review_git_diff(
         repository_id=repo_id,
@@ -62,11 +71,20 @@ async def review_code_diff(
 @router.post("/{repo_id}/generate-pr", response_model=PrGenerateResponseSchema)
 async def generate_pr_description(
     repo_id: str,
-    payload: PrGenerateRequest
+    payload: PrGenerateRequest,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     Generates a professional GitHub Pull Request title and Markdown description based on git diff and test results.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     generator = PrGeneratorService()
     pr_data = await generator.generate_pr_description(
         git_diff=payload.git_diff,

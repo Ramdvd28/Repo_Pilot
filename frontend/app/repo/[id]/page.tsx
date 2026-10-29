@@ -26,6 +26,7 @@ import { api, ApiError } from "@/services/api";
 import { Repository } from "@/types/repo";
 import { LanguageBar } from "@/components/LanguageBar";
 import { formatNumber } from "@/lib/utils";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function RepoDashboardPage() {
   const params = useParams();
@@ -64,22 +65,7 @@ export default function RepoDashboardPage() {
   }
 
   if (error || !repo) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400">
-          <AlertCircle className="w-8 h-8" />
-        </div>
-        <h2 className="text-2xl font-bold text-white">Repository Not Found</h2>
-        <p className="text-gray-400 text-sm max-w-md mx-auto">{error || "Could not retrieve repository data."}</p>
-        <Link
-          href="/analyze"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-semibold text-sm transition-colors border border-border"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Repository Analysis</span>
-        </Link>
-      </div>
-    );
+    return <RepoNotFound repoId={repoId} message={error} />;
   }
 
   const tabs = [

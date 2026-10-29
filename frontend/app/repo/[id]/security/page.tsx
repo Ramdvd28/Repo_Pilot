@@ -20,6 +20,7 @@ import {
 import { api, ApiError } from "@/services/api";
 import { Repository, SecurityFinding, SecurityScanSummaryResponse } from "@/types/repo";
 import { SecurityFindingCard } from "@/components/SecurityFindingCard";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function SecurityAnalysisPage() {
   const params = useParams();
@@ -54,7 +55,11 @@ export default function SecurityAnalysisPage() {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      setError("Failed to load security analysis data.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Failed to load security analysis data.");
+      }
     }
   };
 
@@ -89,6 +94,10 @@ export default function SecurityAnalysisPage() {
         <p className="text-sm text-gray-400">Loading Static Security Dashboard...</p>
       </div>
     );
+  }
+
+  if (error || !repo) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={() => loadSecurityData(selectedSeverity)} />;
   }
 
   return (

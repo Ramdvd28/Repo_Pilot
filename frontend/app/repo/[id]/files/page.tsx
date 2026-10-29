@@ -19,6 +19,7 @@ import { api, ApiError } from "@/services/api";
 import { Repository, RepoFile, IngestionSummary, CodeChunk } from "@/types/repo";
 import { FileTree } from "@/components/FileTree";
 import { CodeViewer } from "@/components/CodeViewer";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function FileExplorerPage() {
   const params = useParams();
@@ -107,6 +108,10 @@ export default function FileExplorerPage() {
         <p className="text-sm text-gray-400">Loading File Explorer...</p>
       </div>
     );
+  }
+
+  if (error || !repo) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={loadData} />;
   }
 
   return (

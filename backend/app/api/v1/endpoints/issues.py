@@ -7,6 +7,7 @@ from sqlalchemy.future import select
 from app.core.database import get_db
 from app.models.schema_models import Issue
 from app.services.issue_analyzer_service import IssueAnalyzerService
+from app.services.repo_service import RepositoryService
 
 router = APIRouter()
 
@@ -59,6 +60,14 @@ async def list_repository_issues(
     """
     Retrieves stored GitHub issues for a repository with optional difficulty filtering.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     query = select(Issue).where(Issue.repository_id == repo_id)
     if difficulty:
         query = query.where(Issue.difficulty_level == difficulty.lower())
@@ -92,6 +101,14 @@ async def get_issue_detail(
     """
     Retrieves analysis details for a single issue by issue number.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     result = await db.execute(
         select(Issue).where(Issue.repository_id == repo_id, Issue.issue_number == issue_number)
     )

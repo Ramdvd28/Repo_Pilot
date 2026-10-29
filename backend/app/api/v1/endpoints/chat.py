@@ -117,6 +117,14 @@ async def list_chat_sessions(
     """
     Lists all chat sessions for a repository.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     result = await db.execute(
         select(ChatSession).where(ChatSession.repository_id == repo_id).order_by(ChatSession.created_at.desc())
     )
@@ -141,6 +149,14 @@ async def get_chat_messages(
     """
     Retrieves message history for a chat session.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     result = await db.execute(
         select(ChatMessage).where(ChatMessage.session_id == session_id).order_by(ChatMessage.created_at.asc())
     )

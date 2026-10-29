@@ -7,6 +7,7 @@ from sqlalchemy.future import select
 from app.core.database import get_db
 from app.models.schema_models import SecurityFinding, CodeQualityFinding
 from app.services.security_service import SecurityService
+from app.services.repo_service import RepositoryService
 
 router = APIRouter()
 
@@ -61,6 +62,14 @@ async def get_security_findings(
     """
     Retrieves stored normalized security findings for a repository.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     query = select(SecurityFinding).where(SecurityFinding.repository_id == repo_id)
     if severity:
         query = query.where(SecurityFinding.severity == severity.lower())
@@ -92,6 +101,14 @@ async def get_quality_findings(
     """
     Retrieves code quality findings for a repository.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     result = await db.execute(
         select(CodeQualityFinding).where(CodeQualityFinding.repository_id == repo_id)
     )

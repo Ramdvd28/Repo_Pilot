@@ -26,7 +26,7 @@ class GeminiProvider(AIProvider):
         if HAS_GEMINI_SDK and self.api_key:
             try:
                 full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                model = genai.GenerativeModel("gemini-3.8-flash")
                 response = model.generate_content(
                     full_prompt,
                     generation_config=genai.types.GenerationConfig(

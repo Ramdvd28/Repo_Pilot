@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Tuple
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.factory import get_ai_provider
 from app.rag.vector_store import VectorStoreService
@@ -43,7 +44,12 @@ class RAGEngine:
         5. Returns answer text and source attribution chunks.
         """
         repo = await self.repo_service.get_by_id(repository_id)
-        repo_name = f"{repo.owner}/{repo.name}" if repo else "Repository"
+        if not repo:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Repository '{repository_id}' not found."
+            )
+        repo_name = f"{repo.owner}/{repo.name}"
 
         # Search top relevant chunks
         relevant_chunks = await self.vector_store.search_relevant_chunks(

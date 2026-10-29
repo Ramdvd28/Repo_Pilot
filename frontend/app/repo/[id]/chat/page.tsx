@@ -18,6 +18,7 @@ import {
 import { api, ApiError } from "@/services/api";
 import { Repository, ChatMessage, ChatSession } from "@/types/repo";
 import { ChatMessageItem } from "@/components/ChatMessageItem";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function RepositoryChatPage() {
   const params = useParams();
@@ -32,11 +33,15 @@ export default function RepositoryChatPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [repoNotFound, setRepoNotFound] = useState(false);
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const loadRepo = () => {
     if (!repoId) return;
+    setLoading(true);
+    setError(null);
+    setRepoNotFound(false);
 
     api.getRepo(repoId)
       .then((data) => {
@@ -45,8 +50,17 @@ export default function RepositoryChatPage() {
       })
       .catch((err) => {
         setLoading(false);
-        setError("Failed to load repository details.");
+        if (err instanceof ApiError && err.status === 404) {
+          setRepoNotFound(true);
+          setError(err.message);
+        } else {
+          setError(err instanceof ApiError ? err.message : "Failed to load repository details.");
+        }
       });
+  };
+
+  useEffect(() => {
+    loadRepo();
   }, [repoId]);
 
   useEffect(() => {
@@ -84,7 +98,14 @@ export default function RepositoryChatPage() {
 
       setMessages((prev) => [...prev, respMsg]);
     } catch (err) {
+      // Revert optimistic user message and restore input question
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticUserMsg.id));
+      setInputQuestion(userQ);
+
       if (err instanceof ApiError) {
+        if (err.status === 404) {
+          setRepoNotFound(true);
+        }
         setError(err.message);
       } else {
         setError("Failed to generate AI response.");
@@ -119,6 +140,10 @@ export default function RepositoryChatPage() {
         <p className="text-sm text-gray-400">Initializing Repository RAG Chat...</p>
       </div>
     );
+  }
+
+  if (!repo || repoNotFound) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={loadRepo} />;
   }
 
   return (

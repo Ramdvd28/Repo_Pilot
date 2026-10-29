@@ -63,7 +63,7 @@ async def get_repository(
     if not repo:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Repository with ID '{repo_id}' not found."
+            detail=f"Repository '{repo_id}' not found."
         )
 
     return RepositoryResponse(
@@ -145,6 +145,14 @@ async def get_repository_files(
     """
     Returns all indexed files for a repository.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     result = await db.execute(
         select(RepositoryFile).where(RepositoryFile.repository_id == repo_id).order_by(RepositoryFile.file_path)
     )
@@ -172,11 +180,31 @@ async def get_file_content(
     Safely reads file content for a relative path inside the repository.
     Strictly prevents path traversal attacks.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     clone_service = CloneService()
     base_dir = clone_service.get_repo_dir(repo_id)
 
     # Validate boundary path traversal check
     target_path = FileScannerService.validate_safe_path(base_dir, path)
+
+    if not target_path.exists() or not target_path.is_file():
+        # In serverless cold starts, on-demand clone into /tmp if not yet cloned
+        try:
+            await clone_service.clone_repository(
+                repo_id=repo.id,
+                github_url=repo.github_url,
+                default_branch=repo.default_branch or "main"
+            )
+            target_path = FileScannerService.validate_safe_path(base_dir, path)
+        except Exception:
+            pass
 
     if not target_path.exists() or not target_path.is_file():
         raise HTTPException(
@@ -214,6 +242,14 @@ async def get_repository_chunks(
     """
     Retrieves stored code chunks for a repository.
     """
+    repo_service = RepositoryService(db)
+    repo = await repo_service.get_by_id(repo_id)
+    if not repo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository '{repo_id}' not found."
+        )
+
     query = select(CodeChunk).where(CodeChunk.repository_id == repo_id)
     if file_path:
         query = query.where(CodeChunk.file_path == file_path)

@@ -18,6 +18,7 @@ import {
 import { api, ApiError } from "@/services/api";
 import { Repository, RepoIssue } from "@/types/repo";
 import { IssueDetailModal } from "@/components/IssueDetailModal";
+import { RepoNotFound } from "@/components/RepoNotFound";
 
 export default function IssueDiscoveryPage() {
   const params = useParams();
@@ -43,7 +44,11 @@ export default function IssueDiscoveryPage() {
       setLoading(false);
     } catch (err) {
       setLoading(false);
-      setError("Failed to load repository issues.");
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError("Failed to load repository issues.");
+      }
     }
   };
 
@@ -83,6 +88,10 @@ export default function IssueDiscoveryPage() {
         <p className="text-sm text-gray-400">Loading Issue Assistant...</p>
       </div>
     );
+  }
+
+  if (error || !repo) {
+    return <RepoNotFound repoId={repoId} message={error} onRetry={() => loadIssues(selectedDifficulty)} />;
   }
 
   return (
