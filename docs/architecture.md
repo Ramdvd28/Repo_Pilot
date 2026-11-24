@@ -8,8 +8,8 @@ graph TD
     FastAPI -->|REST API| GitHub[GitHub REST API]
     FastAPI -->|SQL / pgvector| Postgres[(PostgreSQL + pgvector)]
     FastAPI -->|LLM & Embeddings| AI[AI Provider Abstraction]
-    AI --> OpenAI[OpenAI API]
-    AI --> Gemini[Google Gemini API]
+    AI --> Gemini[Google Gemini API - Primary]
+    AI --> Groq[Groq LPU API - Fallback]
 ```
 
 ## Core Components
@@ -29,4 +29,4 @@ graph TD
    - Vector store for high-performance chunk retrieval in RAG.
 
 4. **AI Provider Abstraction**:
-   - Clean polymorphic interface (`AIProvider`) supporting OpenAI and Google Gemini providers seamlessly.
+   - Clean polymorphic interface (`AIProvider`) supporting Google Gemini (primary) and Groq (automatic fallback) seamlessly.

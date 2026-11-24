@@ -212,3 +212,53 @@ async def test_chat_with_invalid_repository_ids(async_client: AsyncClient):
         repo_resp = await async_client.get(f"/api/v1/repos/{inv_id}")
         assert repo_resp.status_code == 404
         assert repo_resp.json()["detail"] == f"Repository '{inv_id}' not found."
+
+
+@pytest.mark.asyncio
+async def test_chat_ai_provider_failure_returns_clean_503(async_client: AsyncClient, mocker):
+    """
+    Verifies that when AI providers fail (e.g. quota exhausted or timeouts),
+    the endpoint returns HTTP 503 with a user-friendly sanitized message.
+    """
+    from app.ai.base import AIProviderError
+
+    mock_meta = {
+        "github_url": "https://github.com/test/failchat",
+        "owner": "test",
+        "name": "failchat",
+        "description": "Fail chat repo",
+        "stars": 1,
+        "forks": 0,
+        "open_issues": 0,
+        "default_branch": "main",
+        "primary_language": "Python",
+        "languages": {"Python": 100},
+        "topics": []
+    }
+    mocker.patch(
+        "app.services.github_service.GitHubService.fetch_repository_metadata",
+        return_value=mock_meta
+    )
+
+    resp = await async_client.post(
+        "/api/v1/repos/analyze",
+        json={"github_url": "https://github.com/test/failchat"}
+    )
+    assert resp.status_code == 200
+    repo_id = resp.json()["id"]
+
+    # Mock the RAGEngine generate_text to simulate both providers failing
+    mocker.patch(
+        "app.ai.fallback_provider.FallbackAIProvider.generate_text",
+        side_effect=AIProviderError("Sensitive internal connection error", provider="fallback")
+    )
+
+    chat_resp = await async_client.post(
+        f"/api/v1/repos/{repo_id}/chat",
+        json={"question": "Explain the architecture of this project."}
+    )
+    assert chat_resp.status_code == 503
+    detail = chat_resp.json()["detail"]
+    assert detail == "AI service is temporarily unavailable. Please try again in a moment."
+    assert "Sensitive" not in detail
+

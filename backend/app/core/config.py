@@ -117,12 +117,18 @@ class Settings(BaseSettings):
     # GitHub API
     GITHUB_TOKEN: Optional[str] = None
 
-    # AI Configuration
-    AI_PROVIDER: str = "openai"  # "openai" or "gemini"
-    OPENAI_API_KEY: Optional[str] = None
+    # AI Configuration (Gemini Primary, Groq Automatic Fallback)
     GEMINI_API_KEY: Optional[str] = None
-    EMBEDDING_MODEL: str = "text-embedding-3-small"
-    EMBEDDING_DIMENSION: int = 1536
+    GEMINI_MODEL: str = "gemini-3.8-flash"
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "openai/gpt-oss-120b"
+    AI_TIMEOUT_SECONDS: float = 30.0
+
+    # Embeddings Configuration
+    GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-2"
+    EMBEDDING_MODEL: str = "gemini-embedding-2"
+    EMBEDDING_DIMENSIONS: int = 768
+    EMBEDDING_DIMENSION: int = 768
 
     model_config = SettingsConfigDict(
         env_file=".env",

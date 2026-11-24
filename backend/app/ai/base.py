@@ -2,9 +2,21 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 
 
+class AIProviderError(Exception):
+    """
+    Exception raised when an AI provider fails due to rate limits, quota exhaustion,
+    timeouts, or service errors.
+    """
+    def __init__(self, message: str, provider: Optional[str] = None, is_retryable: bool = True):
+        super().__init__(message)
+        self.message = message
+        self.provider = provider
+        self.is_retryable = is_retryable
+
+
 class AIProvider(ABC):
     """
-    Abstract Base Class for AI Providers (OpenAI, Gemini).
+    Abstract Base Class for AI Providers (Google Gemini, Groq).
     Enforces standardized interfaces for text generation and vector embeddings.
     """
 

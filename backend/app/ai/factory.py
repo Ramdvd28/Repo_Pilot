@@ -1,19 +1,21 @@
 from typing import Optional
 from app.ai.base import AIProvider
-from app.ai.openai_provider import OpenAIProvider
 from app.ai.gemini_provider import GeminiProvider
-from app.core.config import settings
+from app.ai.groq_provider import GroqProvider
+from app.ai.fallback_provider import FallbackAIProvider
 
 
 def get_ai_provider(provider_name: Optional[str] = None) -> AIProvider:
     """
     Factory function returning the configured AIProvider instance.
-    Supports "openai" and "gemini".
+    Defaults to FallbackAIProvider (Gemini as primary with Groq as automatic fallback).
+    Supports explicit 'gemini' or 'groq' for isolated provider testing.
     """
-    target_provider = (provider_name or settings.AI_PROVIDER or "openai").lower().strip()
+    if provider_name:
+        name = provider_name.lower().strip()
+        if name == "gemini":
+            return GeminiProvider()
+        if name == "groq":
+            return GroqProvider()
 
-    if target_provider == "gemini":
-        return GeminiProvider()
-    
-    # Default to OpenAI
-    return OpenAIProvider()
+    return FallbackAIProvider()

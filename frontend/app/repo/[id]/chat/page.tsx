@@ -12,7 +12,6 @@ import {
   Bot,
   Trash2,
   ArrowLeft,
-  Cpu,
   HelpCircle,
 } from "lucide-react";
 import { api, ApiError } from "@/services/api";
@@ -28,7 +27,6 @@ export default function RepositoryChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuestion, setInputQuestion] = useState("");
   const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
-  const [provider, setProvider] = useState<string>("openai");
   
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -89,7 +87,6 @@ export default function RepositoryChatPage() {
       const respMsg = await api.sendChatMessage(repoId, {
         question: userQ,
         session_id: activeSessionId,
-        provider: provider,
       });
 
       if (!activeSessionId) {
@@ -105,10 +102,12 @@ export default function RepositoryChatPage() {
       if (err instanceof ApiError) {
         if (err.status === 404) {
           setRepoNotFound(true);
+          setError(err.message);
+        } else {
+          setError("AI service is temporarily unavailable. Please try again in a moment.");
         }
-        setError(err.message);
       } else {
-        setError("Failed to generate AI response.");
+        setError("AI service is temporarily unavailable. Please try again in a moment.");
       }
     } finally {
       setSending(false);
@@ -169,29 +168,9 @@ export default function RepositoryChatPage() {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          {/* AI Provider Switcher */}
-          <div className="flex items-center gap-1.5 bg-gray-900 border border-border rounded-xl p-1 text-xs">
-            <Cpu className="w-3.5 h-3.5 text-violet-400 ml-1.5" />
-            <button
-              onClick={() => setProvider("openai")}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                provider === "openai"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              OpenAI
-            </button>
-            <button
-              onClick={() => setProvider("gemini")}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                provider === "gemini"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Gemini
-            </button>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-900 border border-border text-xs text-gray-400 font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span>AI Code Assistant</span>
           </div>
 
           {messages.length > 0 && (

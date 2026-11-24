@@ -28,8 +28,8 @@ graph TD
     FastAPI -->|Async ORM| Postgres[(PostgreSQL + pgvector)]
     FastAPI -->|REST API| GitHub[GitHub REST API]
     FastAPI -->|Polymorphic Driver| AI[AI Provider Abstraction]
-    AI --> OpenAI[OpenAI API]
-    AI --> Gemini[Google Gemini API]
+    AI --> Gemini[Google Gemini API - Primary]
+    AI --> Groq[Groq LPU API - Fallback]
 ```
 
 ---
@@ -91,7 +91,7 @@ npm install -g vercel
 # Deploy monorepo directly to Vercel
 vercel
 ```
-Or import your GitHub repository directly in the [Vercel Dashboard](https://vercel.com/new). Environment variables (`OPENAI_API_KEY`, `GEMINI_API_KEY`, `GITHUB_TOKEN`, `DATABASE_URL`) can be configured in Vercel Project Settings.
+Or import your GitHub repository directly in the [Vercel Dashboard](https://vercel.com/new). Environment variables (`GEMINI_API_KEY`, `GROQ_API_KEY`, `GITHUB_TOKEN`, `DATABASE_URL`) can be configured in Vercel Project Settings.
 
 ---
 

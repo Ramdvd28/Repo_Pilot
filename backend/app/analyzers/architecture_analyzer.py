@@ -40,7 +40,7 @@ class ArchitectureAnalyzer:
                 has_frontend = True
             if "model" in rel_path or "schema" in rel_path or "db" in rel_path or "sql" in rel_path:
                 has_db = True
-            if "ai" in rel_path or "llm" in rel_path or "openai" in rel_path or "gemini" in rel_path:
+            if "ai" in rel_path or "llm" in rel_path or "gemini" in rel_path or "groq" in rel_path:
                 has_ai = True
 
             # Track key component files
@@ -139,7 +139,7 @@ class ArchitectureAnalyzer:
             "data": {
                 "label": "AI Provider Abstraction",
                 "category": "ai",
-                "description": "Polymorphic AI Provider abstraction supporting OpenAI & Google Gemini APIs for RAG.",
+                "description": "Polymorphic AI Provider abstraction supporting Google Gemini & Groq APIs for RAG with automatic fallback.",
                 "icon": "Sparkles"
             },
             "position": {"x": 350, "y": 380}

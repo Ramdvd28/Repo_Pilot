@@ -68,3 +68,46 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
+
+/* ---- KaTeX overrides for dark theme ---- */
+.katex { color: #e2e8f0; }
+.katex .base { color: inherit; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.5rem 0; }
+.katex-display > .katex { white-space: normal; }
+
+/* ---- Markdown body helpers ---- */
+.markdown-body .katex-display {
+  margin: 1rem 0;
+  background: rgba(15, 20, 31, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+/* Task-list checkboxes (GFM) */
+.markdown-body input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1.5px solid #475569;
+  border-radius: 4px;
+  background: transparent;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+  position: relative;
+}
+.markdown-body input[type="checkbox"]:checked {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+.markdown-body input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Bot, User, ChevronDown, ChevronUp, FileCode, Layers } from "lucide-react";
 import { ChatMessage, ChunkSource } from "@/types/repo";
+import { MarkdownRenderer } from "./MarkdownRenderer";
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -40,9 +41,13 @@ export function ChatMessageItem({ message }: ChatMessageItemProps) {
           </span>
         </div>
 
-        <div className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap font-sans">
-          {message.content}
-        </div>
+        {isUser ? (
+          <div className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap font-sans">
+            {message.content}
+          </div>
+        ) : (
+          <MarkdownRenderer content={message.content} compact />
+        )}
 
         {/* Source Citations Accordion (Assistant Only) */}
         {!isUser && message.sources && message.sources.length > 0 && (

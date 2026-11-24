@@ -16,7 +16,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=2, description="User question about the repository")
     session_id: Optional[str] = Field(None, description="Existing chat session ID if continuing conversation")
-    provider: Optional[str] = Field("openai", description="AI provider to use ('openai' or 'gemini')")
+    provider: Optional[str] = Field(None, description="Optional provider override (defaults to automatic Gemini with Groq fallback)")
 
 
 class ChatMessageResponse(BaseModel):
@@ -84,8 +84,8 @@ async def chat_with_repository(
     )
     db.add(user_msg)
 
-    # 2. Execute RAG Engine
-    rag_engine = RAGEngine(db, provider_name=payload.provider or "openai")
+    # 2. Execute RAG Engine (automatically uses Gemini Primary with Groq Fallback)
+    rag_engine = RAGEngine(db, provider_name=payload.provider)
     answer, sources = await rag_engine.answer_question(repository_id=repo_id, question=payload.question)
 
     # 3. Save assistant message

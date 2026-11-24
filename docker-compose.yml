@@ -32,9 +32,12 @@ services:
       - ENVIRONMENT=production
       - BACKEND_CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - AI_PROVIDER=${AI_PROVIDER:-openai}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=${GROQ_MODEL:-openai/gpt-oss-120b}
+      - GEMINI_EMBEDDING_MODEL=${GEMINI_EMBEDDING_MODEL:-gemini-embedding-2}
+      - EMBEDDING_DIMENSIONS=${EMBEDDING_DIMENSIONS:-768}
     depends_on:
       db:
         condition: service_healthy

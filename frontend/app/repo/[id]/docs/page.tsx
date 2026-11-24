@@ -19,6 +19,7 @@ import {
 import { api, ApiError } from "@/services/api";
 import { Repository, TechDocsResponse } from "@/types/repo";
 import { RepoNotFound } from "@/components/RepoNotFound";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 
 export default function TechnicalDocsPage() {
   const params = useParams();
@@ -163,9 +164,7 @@ export default function TechnicalDocsPage() {
         </div>
 
         {docs?.documentation ? (
-          <div className="prose prose-invert max-w-none text-xs text-gray-200 leading-relaxed font-sans whitespace-pre-wrap">
-            {docs.documentation}
-          </div>
+          <MarkdownRenderer content={docs.documentation} />
         ) : (
           <div className="text-center py-12 space-y-4">
             <BookOpen className="w-10 h-10 text-violet-400 mx-auto" />
